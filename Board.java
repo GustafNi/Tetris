@@ -1,5 +1,5 @@
 
-package tetris;
+package com.mycompany.tetrismaven;
 
 import java.util.Timer;
 import javax.swing.JLabel;
@@ -55,4 +55,18 @@ public class Board extends JPanel {
         clearBoard();
         newPiece();
     }
+    private void pause() {
+        
+        if(! isStarted) {
+            return;
+        }
+        isPaused = !isPaused;
+        
+        if(isPaused) {
+            statusbar.setText("paused");
+        }else {
+            statusbar.setText(String.valueOf(numLinesRemoved));
+        }
+    }
+    
 }

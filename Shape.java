@@ -1,5 +1,5 @@
 
-package tetris;
+package com.mycompany.tetrismaven;
 
 import java.util.Random;
 
