@@ -1,10 +1,12 @@
 
 package com.mycompany.tetrismaven;
 
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.util.Timer;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import tetris.Shape.Tetraminoe;
+import com.mycompany.tetrismaven.Shape.Tetraminoe;
 
 import java.util.TimerTask;
 
@@ -68,5 +70,58 @@ public class Board extends JPanel {
             statusbar.setText(String.valueOf(numLinesRemoved));
         }
     }
-    
+    private void doDrawing(Graphics g) {
+        Dimension size = getSize();
+        int boardTop = (int) size.getHeight() - BOARD_HEIGHT * squareHeight();
+        
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                Tetraminoe shape = shapeAt(j, BOARD_HEIGHT - i -1);
+                if(shape != Tetraminoe.NoShape) {
+                    drawSquare(g, 0 + j * squareWidth(), boardTop + i * squareHeight(), shape);
+                }
+            }
+            
+        }
+        if(curPiece.getShape()!= Tetraminoe.NoShape) {
+            for (int i = 0; i < 4; i++) {
+                int x = curX + curPiece.x(i);
+                int y = curY - curPiece.y(i);
+                drawSquare(g, 0 + x * squareWidth(),boardTop + (BOARD_HEIGHT - y - 1)*
+                        squareHeight(),curPiece.getShape());
+            }
+        }
+    }
+    @Override
+    public void paintComponent(Graphics g ) {
+        super.paintComponent(g);
+        doDrawing(g);
+    }
+    private void dropDown() {
+        int newY = curY;
+        while(newY > 0) {
+            if(! tryMove(curPiece, curX,newY-1)) {
+                break;
+            }
+            --newY;
+        }
+        pieceDropped();
+    }
+    private void oneLineDown() {
+        if(! tryMove(curPiece, curX, curY-1)) {
+            pieceDropped();
+        }
+    }
+    private void clearBoard() {
+        for (int i = 0; i < BOARD_HEIGHT * BOARD_WIDTH; i++) {
+            board[i] = Tetraminoe.NoShape;
+        }
+    }
+    private void pieceDropped() {
+        for (int i = 0; i < 4; i++) {
+            int x = curX + curPiece.x(i);
+            int y = curY - curPiece.y(i);
+            board[(y * BOARD_WIDTH) + x] = curPiece.getShape();
+        }
+    }
 }
