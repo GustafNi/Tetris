@@ -123,5 +123,42 @@ public class Board extends JPanel {
             int y = curY - curPiece.y(i);
             board[(y * BOARD_WIDTH) + x] = curPiece.getShape();
         }
+        removeFullLines();
+        if(!isFallingFinished) {
+            newPiece();
+        }
+    }
+    private void newPiece(){
+        curPiece.setRandomShape();
+        curX = BOARD_WIDTH / 2 + 1;
+        curY = BOARD_HEIGHT - 1 + curPiece.minY();
+        
+        if(! tryMove(curPiece, curX,curY)) {
+            curPiece.setShape(Tetraminoe.NoShape);
+            timer.cancel();
+            isStarted = false;
+            statusbar.setText("Game Over");
+        }
+    }
+    private boolean tryMove(Shape newPiece, int newX, int newY) {
+        for (int i = 0; i < 4; i++) {
+            int x = newX + newPiece.x(i);
+            int y = newY - newPiece.y(i);
+            
+            if(x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT) {
+                return false;
+            }
+            if(shapeAt(x,y) != Tetraminoe.NoShape) {
+                return false;
+            }
+        }
+        curPiece = newPiece;
+        curX = newX;
+        curY = newY;
+        repaint();
+        return true;
+    }
+    private void removeFullLines() {
+        
     }
 }
