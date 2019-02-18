@@ -7,6 +7,7 @@ import java.util.Timer;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import com.mycompany.tetrismaven.Shape.Tetraminoe;
+import java.awt.Color;
 
 import java.util.TimerTask;
 
@@ -159,6 +160,36 @@ public class Board extends JPanel {
         return true;
     }
     private void removeFullLines() {
+        int numFullLines = 0;
         
+        for(int i = BOARD_HEIGHT - 1; i >= 0; --i) {
+            boolean lineIsFull = true;
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                if(shapeAt(j,i) == Tetraminoe.NoShape) {
+                    lineIsFull = false;
+                    break;
+                }
+            }
+            if (lineIsFull) {
+                ++numFullLines;
+                for(int k = i; k < BOARD_HEIGHT - 1; ++k) {
+                    for(int j = 0;j < BOARD_WIDTH; ++j) {
+                        board[(k * BOARD_WIDTH) + j] = shapeAt(j, k + 1);
+                    }
+                }
+            }
+        }
+        if(numFullLines > 0) {
+            numLinesRemoved += numFullLines;
+            statusbar.setText(String.valueOf(numLinesRemoved));
+            isFallingFinished = true;
+            curPiece.setShape(Tetraminoe.NoShape);
+            repaint();
+        }
+    }
+    private void drawSquare(Graphics g ,int x, int y, Tetraminoe shape) {
+        Color colors[] = {
+            new Color(0,0,0), new Color(204,102,102),
+        };
     }
 }
