@@ -8,6 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import com.mycompany.tetrismaven.Shape.Tetraminoe;
 import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import java.util.TimerTask;
 
@@ -190,6 +192,78 @@ public class Board extends JPanel {
     private void drawSquare(Graphics g ,int x, int y, Tetraminoe shape) {
         Color colors[] = {
             new Color(0,0,0), new Color(204,102,102),
+            new Color(102,204,102), new Color(102,102,204),
+            new Color(204,204,102), new Color(204,102,204),
+            new Color(201,204,204), new Color(218,170,0)
         };
+        Color color = colors[shape.ordinal()];
+        
+        g.setColor(color);
+        g.fillRect(x + 1, y + 1, squareWidth() - 2, squareHeight() - 2);
+        g.setColor(color.brighter());
+        g.drawLine(x, y + squareHeight() - 2, x, y);
+        g.drawLine(x, y, x + squareWidth() -1, y);
+        g.setColor(color.darker());
+        g.drawLine(x + 1, y + squareHeight() -1 , x + squareWidth() -1, y + squareHeight()-1);
+        g.drawLine(x + squareWidth()-1, y + squareHeight()-1, x + squareWidth() -1, y +1);
+    }
+    private void doGameCycle() {
+        update();
+        repaint();
+    }
+    private void update() {
+        if(isPaused) {
+            return;
+        }
+        if(isFallingFinished) {
+            isFallingFinished = false;
+            newPiece();
+        }else {
+            oneLineDown();
+        }
+    }
+    private class TAdapter extends KeyAdapter {
+    
+        @Override
+        public void keyPressed(KeyEvent e) {
+            System.out.println("key pressed");
+            if(!isStarted || curPiece.getShape() == Tetraminoe.NoShape) {
+                return;
+            }
+            int keycode = e.getKeyCode();
+            if(keycode == KeyEvent.VK_P) {
+                pause();
+                return;
+            }
+            if(isPaused) {
+                return;
+            }
+            switch (keycode) {
+                case KeyEvent.VK_LEFT:
+                    tryMove(curPiece, curX - 1, curY);
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    tryMove(curPiece, curX + 1, curY);
+                    break;
+                case KeyEvent.VK_DOWN:
+                    tryMove(curPiece.rotateRight(), curX, curY);
+                    break;
+                case KeyEvent.VK_UP:
+                    tryMove(curPiece.rotateLeft(), curX, curY);
+                    break;
+                case KeyEvent.VK_SPACE:
+                    dropDown();
+                    break;
+                case KeyEvent.VK_D:
+                    oneLineDown();
+                    break;
+            }
+        }
+    }
+    private class ScheduleTask extends TimerTask {
+        @Override
+        public void run() {
+            doGameCycle();
+        }
     }
 }
